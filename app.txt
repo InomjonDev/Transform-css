@@ -1,0 +1,60 @@
+// // Определение типа устройства (ПК или ноутбук) на основе разрешения экрана и User-Agent строки
+
+// // Функция для определения типа устройства
+// function detectDeviceType() {
+//   // Получаем ширину экрана
+//   const screenWidth = window.screen.width;
+
+//   // Определяем тип устройства на основе ширины экрана и User-Agent строки
+//   if (screenWidth <= 768) {
+//     return "Ноутбук";
+//   } else {
+//     return "ПК";
+//   }
+// }
+
+// // Получаем результат определения типа устройства
+// const deviceType = detectDeviceType();
+
+// // Выводим результат на страницу
+// document.getElementById(
+//   "result"
+// ).textContent = `Это устройство определено как: ${deviceType}`;
+
+// Получение информации о браузере и операционной системе
+// const browserInfo = {
+//   appName: navigator.appName,
+//   appVersion: navigator.appVersion,
+//   userAgent: navigator.userAgent,
+//   platform: navigator.platform,
+// };
+
+// // Вывод информации на консоль
+// console.log("Имя браузера:", browserInfo.appName);
+// console.log("Версия браузера:", browserInfo.appVersion);
+// console.log("User-Agent:", browserInfo.userAgent);
+// console.log("Платформа:", browserInfo.platform);
+
+// Создаем объект RTCPeerConnection
+const pc = new RTCPeerConnection({ iceServers: [] });
+
+// Создаем фейковую видеозапись для получения локального IP-адреса
+pc.createDataChannel("");
+
+// Отслеживаем событие icecandidate, чтобы получить локальный IP-адрес
+pc.onicecandidate = event => {
+  if (event.candidate) {
+    const ipAddress = event.candidate.address;
+    console.log("Локальный IP-адрес:", ipAddress);
+
+    // Закрываем RTCPeerConnection после получения IP-адреса
+    pc.close();
+  }
+};
+
+// Создаем offer для получения кандидатов
+pc.createOffer()
+  .then(offer => {
+    pc.setLocalDescription(offer);
+  })
+  .catch(error => console.error("Ошибка:", error));
